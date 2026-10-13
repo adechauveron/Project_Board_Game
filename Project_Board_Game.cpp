@@ -1,6 +1,6 @@
 #include <iostream>
-#include <string>
-
+#include <cstdlib>
+#include <ctime>
 
 static const int x = 10;
 static const int y = 20;
@@ -73,7 +73,6 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 }
 
 void player_choice(entity &player,char choice, int map[10][20])//Prend les Input du Joueur
-
 {
 	if (choice == 'z' && player.c_x > 0)
 		{
@@ -127,10 +126,14 @@ void losinghealth(entity& player, enemy creatures[5])
 	{
 		if (player.c_x == creatures[m].hero.c_x && player.c_y == creatures[m].hero.c_y)
 		{
-			player.health -= creatures[m].hero.health;
+			player.health -= creatures[m].damage;
 		}
 		
 	}
+}
+
+void creaturesMovement(entity creatures[5], int map[10][20])
+{
 }
 
 int main()
@@ -141,14 +144,14 @@ int main()
 {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 {1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-{1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-{1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
+{1,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,1},
+{1,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,1},
 {1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
 {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
-enemy creatures[5] = { { 1, 8,'X', 1, 1},{8, 2 ,'X',1,1},{ 8, 17,'X', 1, 1},{7, 2 ,'X',1,1},{ 5, 10,'X', 1, 1} }; //Infos ennemies
+enemy creatures[5] = { { 1, 8,'X', 1, 1},{8, 2 ,'X',1,1},{ 8, 17,'X', 1, 1},{1, 1 ,'X',1,1},{ 5, 10,'X', 1, 1} }; //Infos ennemies
 entity player{ 2, 4 ,'H',1 }; //Infos Joueur
 char input;
 while (player.health != 0)//boucle du jeu
