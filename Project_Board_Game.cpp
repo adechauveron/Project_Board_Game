@@ -15,9 +15,8 @@ struct entity
 
 struct enemy
 {
-	entity hero;
+	entity monster;
 	int damage;
-	bool spawn = true;
 };
 
 struct tile 
@@ -42,7 +41,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 
 			for (int m = 0; m < 5; m++) //Place les monstres
 			{
-				if (i == creatures[m].hero.c_x && j == creatures[m].hero.c_y)
+				if (i == creatures[m].monster.c_x && j == creatures[m].monster.c_y)
 				{
 					spawnenemy = true;
 					enemyexist = m;
@@ -50,7 +49,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 			}
 			if (spawnenemy)
 			{
-				std::cout << creatures[enemyexist].hero.name << ' ';
+				std::cout << creatures[enemyexist].monster.name << ' ';
 			}
 			else if (i == player.c_x && j == player.c_y) //Place l'Avatar
 			{
@@ -120,24 +119,99 @@ void player_choice(entity &player,char choice, int map[10][20])//Prend les Input
 		}
 }
 
+bool collidingenemy(enemy creatures[5], int x, int y)
+{
+	for (int m = 0; m < 5; m++)
+	{
+		if (x == creatures[m].monster.c_x && y == creatures[m].monster.c_y)
+		{
+			std::cout << "ENNEMI";
+			return true;
+		}
+
+	}
+}
+
 void losinghealth(entity& player, enemy creatures[5])
 {
 	for (int m = 0; m < 5; m++)
 	{
-		if (player.c_x == creatures[m].hero.c_x && player.c_y == creatures[m].hero.c_y)
+		if (collidingenemy(creatures, player.c_x, player.c_y) == true)
 		{
 			player.health -= creatures[m].damage;
 		}
-		
 	}
 }
 
-void creaturesMovement(entity creatures[5], int map[10][20])
+tile get_tile_at(int map[10][20],int x,int y)
 {
+	int index = map[x][y];
+	tile current_tile = tiles[index];
+	return current_tile;
+}
+
+void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
+{
+	int block=0;
+	int random = rand() % 4;
+	for (int current_m = 0; current_m < 5; current_m++)
+	{
+		if (random == 0 && creatures[current_m].monster.c_x > 0)
+		{
+			tile Next_tile = get_tile_at(map, creatures[current_m].monster.c_x-1,creatures[current_m].monster.c_y);
+			if (Next_tile.traversal) 
+			{
+				if (collidingenemy(creatures, creatures[current_m].monster.c_x - 1, creatures[current_m].monster.c_y)==false)
+				{
+					block += 1;
+				}
+				creatures[current_m].monster.c_x -= 1;
+			}
+		}
+		else if (random == 1 && creatures[current_m].monster.c_x < 9)
+		{
+			tile Next_tile = get_tile_at(map, creatures[current_m].monster.c_x + 1, creatures[current_m].monster.c_y);
+			if (Next_tile.traversal)
+			{
+				if (collidingenemy(creatures, creatures[current_m].monster.c_x - 1, creatures[current_m].monster.c_y) == false)
+				{
+					block += 1;
+	
+				}
+				creatures[current_m].monster.c_x += 1;
+			}
+		}
+		else if (random == 2 && creatures[current_m].monster.c_y > 0)
+		{
+			tile Next_tile = get_tile_at(map, creatures[current_m].monster.c_x, creatures[current_m].monster.c_y-1);
+			if (Next_tile.traversal)
+			{
+				if (collidingenemy(creatures, creatures[current_m].monster.c_x, creatures[current_m].monster.c_y-1) == false)
+				{
+					block += 1;
+				}
+				creatures[current_m].monster.c_y -= 1;
+			}
+		}
+		else if (random == 0 && creatures[current_m].monster.c_y < 19)
+		{
+			tile Next_tile = get_tile_at(map, creatures[current_m].monster.c_x, creatures[current_m].monster.c_y+1);
+			if (Next_tile.traversal)
+			{
+				if (collidingenemy(creatures, creatures[current_m].monster.c_x, creatures[current_m].monster.c_y+1) == false)
+				{
+					block += 1;
+				}
+				creatures[current_m].monster.c_y += 1;
+				
+			}
+		}
+	}
 }
 
 int main()
 {
+	srand(time(0));
 	int map1[10][20] = //Premier niveau du jeu
 { 
 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -151,8 +225,14 @@ int main()
 {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
-enemy creatures[5] = { { 1, 8,'X', 1, 1},{8, 2 ,'X',1,1},{ 8, 17,'X', 1, 1},{1, 1 ,'X',1,1},{ 5, 10,'X', 1, 1} }; //Infos ennemies
-entity player{ 2, 4 ,'H',1 }; //Infos Joueur
+enemy creatures[5] = { 
+	{1,8,'X',1,1},
+	{8,2 ,'X',1,1},
+	{8,17,'X',1,1},
+	{1,1 ,'X',1,1},
+	{5,10,'X',1,1} 
+}; //Infos ennemies
+entity player{2,4,'H',1}; //Infos Joueur
 char input;
 while (player.health != 0)//boucle du jeu
 	{
@@ -161,10 +241,14 @@ while (player.health != 0)//boucle du jeu
 		std::cin >> input;
 		player_choice(player,input,map1);
 		losinghealth(player, creatures);
+		creaturesM(creatures, map1);
+		losinghealth(player, creatures);
 		system("cls");
 		if (player.health <= 0)
 		{
-		std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !";
+		system("cls");
+		std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !"<<'\n';
+		return 1;
 		}
 	}
 	return 0;
