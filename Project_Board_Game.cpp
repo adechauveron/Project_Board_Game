@@ -17,6 +17,8 @@ struct enemy
 {
 	entity monster;
 	int damage;
+	int current_x;
+	int current_y;
 };
 
 struct tile
@@ -43,13 +45,11 @@ bool collidingenemy(enemy creatures[5], int x, int y)
 	{
 		if (x == creatures[current_m].monster.coord_x && y == creatures[current_m].monster.coord_y)
 		{
-			std::cout << "ENNEMI";
 			return true;
 		}
-
 	}
+	return false;
 }
-
 
 void losinghealth(entity& player, enemy creatures[5])
 {
@@ -73,7 +73,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 
 			for (int current_m = 0; current_m < 5; current_m++) //Place les monstres
 			{
-				if (i == creatures[current_m].monster.coord_x && j == creatures[current_m].monster.coord_y)
+				if (i == creatures[current_m].current_x && j == creatures[current_m].current_y)
 				{
 					spawnenemy = true;
 					enemyexist = current_m;
@@ -155,14 +155,10 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y))
+				if (collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y)==false)
 				{
-					block += 1;
+					creatures[current_m].current_x -= 1;
 				}
-				else {
-					creatures[current_m].monster.coord_x -= 1;
-				}
-				
 			}
 		}
 		else if (random == 1 && creatures[current_m].monster.coord_x < 9)
@@ -170,14 +166,9 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x + 1, creatures[current_m].monster.coord_y);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y))
+				if (collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y)==false)
 				{
-					block += 1;
-
-				}
-				else
-				{
-					creatures[current_m].monster.coord_x += 1;
+					creatures[current_m].current_x += 1;
 				}
 				
 			}
@@ -187,13 +178,9 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1))
+				if (collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1)==false)
 				{
-					block += 1;
-				}
-				else
-				{
-					creatures[current_m].monster.coord_y -= 1;
+					creatures[current_m].current_y -= 1;
 				}
 			}
 		}
@@ -202,18 +189,21 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1))
+				if (collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1)==false)
 				{
-					block += 1;
-				}
-				else
-				{
-					creatures[current_m].monster.coord_y += 1;
+					creatures[current_m].current_y += 1;
 				}
 
 			}
 		}
-		std::cout << block;
+	}
+}
+void creatures_update(enemy creatures[5])
+{
+	for (int current_m = 0; current_m < 5; current_m++)
+	{
+		creatures[current_m].monster.coord_x = creatures[current_m].current_x;
+		creatures[current_m].monster.coord_y = creatures[current_m].current_y;
 	}
 }
 
@@ -234,11 +224,11 @@ int main()
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	};
 	enemy creatures[5] = {
-		{1,8,'X',1,1},
-		{8,2 ,'X',1,1},
-		{8,17,'X',1,1},
-		{1,1 ,'X',1,1},
-		{5,10,'X',1,1}
+		{1,8,'X',1,1,1,8},
+		{8,2 ,'X',1,1,8,2},
+		{8,17,'X',1,1,8,17},
+		{1,1 ,'X',1,1,1,1},
+		{5,10,'X',1,1,5,10}
 	}; //Infos ennemies
 	entity player{ 2,4,'H',1 }; //Infos Joueur
 	char input;
@@ -250,7 +240,9 @@ int main()
 		player_choice(player, input, map1);
 		losinghealth(player, creatures);
 		creaturesM(creatures, map1);
+		creatures_update(creatures);
 		losinghealth(player, creatures);
+		system("cls");
 		if (player.health <= 0)
 		{
 			system("cls");

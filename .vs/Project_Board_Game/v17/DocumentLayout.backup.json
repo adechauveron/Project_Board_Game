@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\adechauveron\\Downloads\\Project_Board_Game-Dev\\Project_Board_Game-Dev\\",
+  "WorkspaceRootPath": "C:\\Users\\adechauveron\\Documents\\GitHub\\Project_Board_Game\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{35980C53-10C1-4D78-A1FE-D6F273D2FE07}|Project_Board_Game.vcxproj|C:\\Users\\adechauveron\\Downloads\\Project_Board_Game-Dev\\Project_Board_Game-Dev\\Project_Board_Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{35980C53-10C1-4D78-A1FE-D6F273D2FE07}|Project_Board_Game.vcxproj|C:\\Users\\adechauveron\\Documents\\GitHub\\Project_Board_Game\\Project_Board_Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{35980C53-10C1-4D78-A1FE-D6F273D2FE07}|Project_Board_Game.vcxproj|solutionrelative:Project_Board_Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Project_Board_Game.cpp",
-              "DocumentMoniker": "C:\\Users\\adechauveron\\Downloads\\Project_Board_Game-Dev\\Project_Board_Game-Dev\\Project_Board_Game.cpp",
+              "DocumentMoniker": "C:\\Users\\adechauveron\\Documents\\GitHub\\Project_Board_Game\\Project_Board_Game.cpp",
               "RelativeDocumentMoniker": "Project_Board_Game.cpp",
-              "ToolTip": "C:\\Users\\adechauveron\\Downloads\\Project_Board_Game-Dev\\Project_Board_Game-Dev\\Project_Board_Game.cpp",
+              "ToolTip": "C:\\Users\\adechauveron\\Documents\\GitHub\\Project_Board_Game\\Project_Board_Game.cpp",
               "RelativeToolTip": "Project_Board_Game.cpp",
-              "ViewState": "AgIAAJYAAAAAAAAAAAAAwKoAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAADIAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-10-12T12:43:45.625Z",
               "EditorCaption": ""
