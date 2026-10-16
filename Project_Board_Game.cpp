@@ -3,6 +3,7 @@
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <conio.h>
 
 static const int x = 10;
 static const int y = 20;
@@ -30,20 +31,19 @@ struct tile
 	bool traversal;
 	bool win_cond = false;
 };
+
 const tile water{ '~',1,false }; //Infos Tile Water
 const tile mountain{ 'M',2, false };//Infos Tile Mountain
 const tile ground{ '.',0, true,false};//Infos Tile Ground
-const tile win{'E',3,true,true};
+const tile win{'E',3,true,true}; // Infos Tile Win
 tile const tiles[4] = { ground, water, mountain, win}; //Tableau des différents types de Tiles
-
-tile get_tile_at(int map[10][20], int x, int y)
+tile get_tile_at(int map[10][20], int x, int y) // Récupérer une tile aux coordonnées x et y
 {
 	int index = map[x][y];
 	tile current_tile = tiles[index];
 	return current_tile;
-}
-
-bool win_condition(entity& player, int map[10][20], int x, int y)
+} 
+bool win_condition(entity& player, int map[10][20], int x, int y) // vérifie la condition de victoire (atteindre E)
 {
 	tile win = get_tile_at(map, x, y);
 	if (win.win_cond == true)
@@ -54,9 +54,8 @@ bool win_condition(entity& player, int map[10][20], int x, int y)
 	{
 		return false;
 	}
-}
-
-bool collidingenemy(enemy creatures[5], int x, int y)
+} 
+bool collidingenemy(enemy creatures[5], int x, int y) //Renvoie Vrai si un ennemi se trouve aux coordonnées x et y
 {
 	for (int current_m = 0; current_m < 5; current_m++)
 	{
@@ -67,8 +66,7 @@ bool collidingenemy(enemy creatures[5], int x, int y)
 	}
 	return false;
 }
-
-void losinghealth(entity& player, enemy creatures[5])
+void losinghealth(entity& player, enemy creatures[5]) //Calcule les dégats après avoir touché un ennemi
 {
 	for (int current_m = 0; current_m < 5; current_m++)
 	{
@@ -78,7 +76,6 @@ void losinghealth(entity& player, enemy creatures[5])
 		}
 	}
 }
-
 void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche le plateau
 {
 	for (int i = 0; i < x; i++) //i = ligne
@@ -88,7 +85,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 			bool spawnenemy = false;
 			int enemyexist;
 
-			for (int current_m = 0; current_m < 5; current_m++) //Place les monstres
+			for (int current_m = 0; current_m < 5; current_m++)
 			{
 				if (i == creatures[current_m].current_x && j == creatures[current_m].current_y)
 				{
@@ -96,21 +93,21 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 					enemyexist = current_m;
 				}
 			}
-			if (spawnenemy)
+			if (spawnenemy)  //Place les monstres
 			{
 				std::cout << creatures[enemyexist].monster.name << ' ';
 			}
-			else if (i == player.coord_x && j == player.coord_y) //Place l'Avatar
+			else if (i == player.coord_x && j == player.coord_y) 
 			{
-				std::cout << player.name << ' ';
+				std::cout << player.name << ' '; //Place l'Avatar
 			}
 			else
 			{
 				for (int c = 0; c < 4; c++)
 				{
-					if (map[i][j] == tiles[c].indice) //Place les tiles
+					if (map[i][j] == tiles[c].indice) 
 					{
-						std::cout << tiles[c].name << ' ';
+						std::cout << tiles[c].name << ' '; //Place les tiles
 					}
 
 				}
@@ -119,8 +116,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 		std::cout << std::endl;
 	}
 }
-
-void player_choice(entity& player, char choice, int map[10][20])//Prend les Input du Joueur
+void player_choice(entity& player, char choice, int map[10][20])//Prend les Input du Joueur et les interprète en déplacements
 {
 	if (choice == 'z' && player.coord_x > 0)
 	{
@@ -159,9 +155,7 @@ void player_choice(entity& player, char choice, int map[10][20])//Prend les Inpu
 
 	}
 }
-
-
-void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
+void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis (aléatoire)
 {
 	int block = 0;
 	int random = rand() % 4;
@@ -215,7 +209,7 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis
 		}
 	}
 }
-void creatures_update(enemy creatures[5])
+void creatures_update(enemy creatures[5]) // Change les anciennes coordonnées pour prendre en compte le déplacement
 {
 	for (int current_m = 0; current_m < 5; current_m++)
 	{
@@ -223,8 +217,7 @@ void creatures_update(enemy creatures[5])
 		creatures[current_m].monster.coord_y = creatures[current_m].current_y;
 	}
 }
-
-void storytime()
+void storytime() // L'histoire qui se lance au début du jeu
 {
 	char input = 'p';
 	while (input == 'p')
@@ -241,7 +234,7 @@ void storytime()
 int main()
 {
 	srand(time(0));
-	int map1[10][20] = //Premier niveau du jeu
+	int map1[10][20] = //Premier plateau du jeu
 	{
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -254,7 +247,7 @@ int main()
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	};
-	int map2[10][20] = //Deuxième niveau du jeu
+	int map2[10][20] = //Deuxième plateau du jeu
 	{
 	{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -267,27 +260,27 @@ int main()
 	{1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	{1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	};
-	enemy creatures[5] = {
+	enemy creatures[5] = {//Infos ennemies lvl 1
 		{1,8,'X',1,1,1,8},
 		{8,2 ,'X',1,1,8,2},
 		{8,17,'X',1,1,8,17},
 		{1,1 ,'X',1,1,1,1},
 		{5,10,'X',1,1,5,10}
-	}; //Infos ennemies lvl 1
-	enemy creatures2[5] = {
+	}; 
+	enemy creatures2[5] = {// Infos ennemis lvl2 
 		{2,8,'X',1,1,2,8},
 		{8,3 ,'X',1,1,8,3},
 		{8,15,'X',1,1,8,15},
 		{1,8 ,'X',1,1,1,8},
 		{3,10,'X',1,1,3,10}
-	};// Infos ennemis lvl2 2
+	};
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
-	entity player2{ 2,2,'H',1 }; //Infos Joueur lvl 2
+	entity player2{ 2,2,'H',2 }; //Infos Joueur lvl 2
 	char input;
 	storytime(); //Ecran de lancement + Lore 
 	while (player.health != 0)//boucle du jeu
 	{
-		while (win_condition(player, map1, player.coord_x, player.coord_y) == false)
+		while (win_condition(player, map1, player.coord_x, player.coord_y) == false) // 1 er niveau
 		{
 			afficherMap(map1, player, creatures);
 			std::cout << "Ordonner votre avatar : ";
@@ -311,7 +304,7 @@ int main()
 		std::cin >> input;
 		if (input == 'y') {
 			system("cls");
-			while (win_condition(player2, map2, player2.coord_x, player2.coord_y) == false)
+			while (win_condition(player2, map2, player2.coord_x, player2.coord_y) == false) // 2eme niveau
 			{
 				afficherMap(map2, player2, creatures2);
 				std::cout << "Ordonner votre avatar : ";
