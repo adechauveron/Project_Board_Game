@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <string>
 
 static const int x = 10;
 static const int y = 20;
@@ -26,17 +28,32 @@ struct tile
 	char name;
 	int indice;
 	bool traversal;
+	bool win_cond = false;
 };
 const tile water{ '~',1,false }; //Infos Tile Water
 const tile mountain{ 'M',2, false };//Infos Tile Mountain
-const tile ground{ '.',0, true };//Infos Tile Ground
-tile const tiles[3] = { ground, water, mountain }; //Tableau des différents types de Tiles
+const tile ground{ '.',0, true,false};//Infos Tile Ground
+const tile win{'E',3,true,true};
+tile const tiles[4] = { ground, water, mountain, win}; //Tableau des différents types de Tiles
 
 tile get_tile_at(int map[10][20], int x, int y)
 {
 	int index = map[x][y];
 	tile current_tile = tiles[index];
 	return current_tile;
+}
+
+bool win_condition(entity& player, int map[10][20], int x, int y)
+{
+	tile win = get_tile_at(map, x, y);
+	if (win.win_cond == true)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool collidingenemy(enemy creatures[5], int x, int y)
@@ -89,7 +106,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 			}
 			else
 			{
-				for (int c = 0; c < 3; c++)
+				for (int c = 0; c < 4; c++)
 				{
 					if (map[i][j] == tiles[c].indice) //Place les tiles
 					{
@@ -216,12 +233,25 @@ int main()
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	{1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,2,2,2,3,0,0,0,0,0,0,0,0,1},
 	{1,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,1},
 	{1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	};
+	int map2[10][20] = //Deuxième niveau du jeu
+	{
+	{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{2,0,0,0,1,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
+	{2,0,0,0,1,0,0,1,1,1,3,1,1,0,0,0,0,0,0,1},
+	{2,0,2,2,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1},
+	{2,0,2,2,2,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
+	{2,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	};
 	enemy creatures[5] = {
 		{1,8,'X',1,1,1,8},
@@ -229,26 +259,62 @@ int main()
 		{8,17,'X',1,1,8,17},
 		{1,1 ,'X',1,1,1,1},
 		{5,10,'X',1,1,5,10}
-	}; //Infos ennemies
-	entity player{ 2,4,'H',1 }; //Infos Joueur
+	}; //Infos ennemies lvl 1
+	enemy creatures2[5] = {
+		{2,8,'X',1,1,2,8},
+		{8,3 ,'X',1,1,8,3},
+		{8,15,'X',1,1,8,15},
+		{1,8 ,'X',1,1,1,8},
+		{3,10,'X',1,1,3,10}
+	};// Infos ennemis lvl2 2
+	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
+	entity player2{ 2,2,'H',1 }; //Infos Joueur lvl 2
 	char input;
 	while (player.health != 0)//boucle du jeu
 	{
-		afficherMap(map1, player, creatures);
-		std::cout << "Ordonner votre avatar : ";
-		std::cin >> input;
-		player_choice(player, input, map1);
-		losinghealth(player, creatures);
-		creaturesM(creatures, map1);
-		creatures_update(creatures);
-		losinghealth(player, creatures);
-		system("cls");
-		if (player.health <= 0)
+		while (win_condition(player, map1, player.coord_x, player.coord_y) == false)
 		{
+			afficherMap(map1, player, creatures);
+			std::cout << "Ordonner votre avatar : ";
+			std::cin >> input;
+			player_choice(player, input, map1);
+			losinghealth(player, creatures);
+			creaturesM(creatures, map1);
+			creatures_update(creatures);
+			losinghealth(player, creatures);
 			system("cls");
-			std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !" << '\n';
-			return 1;
+			if (player.health <= 0)
+			{
+				system("cls");
+				std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !" << '\n';
+			}
+		}
+		while (win_condition(player2, map2, player2.coord_x, player2.coord_y) == false)
+		{
+			afficherMap(map2, player2, creatures2);
+			std::cout << "Ordonner votre avatar : ";
+			std::cin >> input;
+			player_choice(player2, input, map2);
+			losinghealth(player2, creatures2);
+			creaturesM(creatures2, map2);
+			creatures_update(creatures2);
+			losinghealth(player2, creatures2);
+			system("cls");
+			if (player2.health <= 0)
+			{
+				player.health = player2.health;
+				system("cls");
+				std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !" << '\n';
+			}
+
+		}
+		if (win_condition(player2, map2, player2.coord_x, player2.coord_y) == true)
+		{
+			std::cout << "you win";
+			player.health = -1;
+			return -1;
 		}
 	}
 	return 0;
 }
+
