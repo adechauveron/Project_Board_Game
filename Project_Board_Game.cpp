@@ -224,7 +224,25 @@ void creatures_update(enemy creatures[5])
 	}
 }
 
+<<<<<<< Updated upstream
 int main()
+=======
+void storytime()
+{
+	char input = 'p';
+	while (input == 'p')
+	{
+		std::cout << "BOARD OF DREAMS" << '\n';
+		std::cout << "This world is a dream among many" << '\n';
+		std::cout << "The darkness has won its first battle against the mind" << '\n';
+		std::cout << "Go onto the boards, find the exit, and you will get salvation !";
+		std::cin >> input;
+		system("cls");
+	}
+}
+
+int main(int argc, char* argv[])
+>>>>>>> Stashed changes
 {
 	srand(time(0));
 	int map1[10][20] = //Premier niveau du jeu
@@ -270,6 +288,10 @@ int main()
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
 	entity player2{ 2,2,'H',1 }; //Infos Joueur lvl 2
 	char input;
+<<<<<<< Updated upstream
+=======
+	storytime(); //Ecran de lancement + Lore 
+>>>>>>> Stashed changes
 	while (player.health != 0)//boucle du jeu
 	{
 		while (win_condition(player, map1, player.coord_x, player.coord_y) == false)
@@ -286,28 +308,44 @@ int main()
 			if (player.health <= 0)
 			{
 				system("cls");
-				std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !" << '\n';
+				std::cout << "And the world fell to darkness...";
+				return 666;
 			}
 		}
-		while (win_condition(player2, map2, player2.coord_x, player2.coord_y) == false)
-		{
-			afficherMap(map2, player2, creatures2);
-			std::cout << "Ordonner votre avatar : ";
-			std::cin >> input;
-			player_choice(player2, input, map2);
-			losinghealth(player2, creatures2);
-			creaturesM(creatures2, map2);
-			creatures_update(creatures2);
-			losinghealth(player2, creatures2);
+		std::cout << "LEVEL 1 COMPLETED !!!" << '\n';
+		std::cout << "MOVING TO NEXT LEVEL ?" << '\n';
+		std::cout << "<y> or <n> ?" << '\n';
+		std::cin >> input;
+		if (input == 'y') {
 			system("cls");
-			if (player2.health <= 0)
+			while (win_condition(player2, map2, player2.coord_x, player2.coord_y) == false)
 			{
-				player.health = player2.health;
+				afficherMap(map2, player2, creatures2);
+				std::cout << "Ordonner votre avatar : ";
+				std::cin >> input;
+				player_choice(player2, input, map2);
+				losinghealth(player2, creatures2);
+				creaturesM(creatures2, map2);
+				creatures_update(creatures2);
+				losinghealth(player2, creatures2);
 				system("cls");
-				std::cout << "GAME OVER" << '\n' << "Vous avez perdu la partie !" << '\n';
-			}
+				if (player2.health <= 0)
+				{
+					player.health = player2.health;
+					system("cls");
+					std::cout << "And the world fell to darkness...";
+					return 666;
+				}
 
+			}
 		}
+		else if (input == 'n')
+		{
+			system("cls");
+			std::cout << "And the world fell to darkness...";
+			return 666;
+		}
+	
 		if (win_condition(player2, map2, player2.coord_x, player2.coord_y) == true)
 		{
 			std::cout << "you win";
