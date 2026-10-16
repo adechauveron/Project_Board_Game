@@ -224,9 +224,6 @@ void creatures_update(enemy creatures[5])
 	}
 }
 
-<<<<<<< Updated upstream
-int main()
-=======
 void storytime()
 {
 	char input = 'p';
@@ -241,8 +238,7 @@ void storytime()
 	}
 }
 
-int main(int argc, char* argv[])
->>>>>>> Stashed changes
+int main()
 {
 	srand(time(0));
 	int map1[10][20] = //Premier niveau du jeu
@@ -288,10 +284,7 @@ int main(int argc, char* argv[])
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
 	entity player2{ 2,2,'H',1 }; //Infos Joueur lvl 2
 	char input;
-<<<<<<< Updated upstream
-=======
 	storytime(); //Ecran de lancement + Lore 
->>>>>>> Stashed changes
 	while (player.health != 0)//boucle du jeu
 	{
 		while (win_condition(player, map1, player.coord_x, player.coord_y) == false)

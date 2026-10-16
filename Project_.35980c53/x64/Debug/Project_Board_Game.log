@@ -1,7 +1,4 @@
 ﻿  Project_Board_Game.cpp
-<<<<<<< Updated upstream
-C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\Project_Board_Game.cpp(229,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-=======
-C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\Project_Board_Game.cpp(245,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
->>>>>>> Stashed changes
+C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\Project_Board_Game.cpp(243,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+  LINK : C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\x64\Debug\Project_Board_Game.exe introuvable ou non généré par la dernière édition de liens incrémentielle ; édition de liens complète en cours
   Project_Board_Game.vcxproj -> C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\x64\Debug\Project_Board_Game.exe
