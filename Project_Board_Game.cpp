@@ -3,6 +3,8 @@
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <curses.h>
+#include <panel.h>
 
 static const int x = 10;
 static const int y = 20;
@@ -224,10 +226,12 @@ void creatures_update(enemy creatures[5])
 	}
 }
 
-int main()
+WINDOW* creation_display_ncurses(int height, int width, int start_y, int start_x);
+
+int main(int argc, char* argv[])
 {
 	srand(time(0));
-	int map1[10][20] = //Premier niveau du jeu
+	bool InGame = true;	int map1[10][20] = //Premier niveau du jeu
 	{
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -270,10 +274,29 @@ int main()
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
 	entity player2{ 2,2,'H',1 }; //Infos Joueur lvl 2
 	char input;
+	
+	WINDOW* affichage;
+	int start_x, start_y, width, height;
+	int ch;
+	initscr();// Initie ncurses
+	cbreak();
+
+	start_color();
+	height = 10;
+	width = 30;
+	start_x = (COLS - width) / 2;
+	start_y = 0;
+	refresh();
+
+	affichage = creation_display_ncurses(height, width, start_x, start_y);
+
 	while (player.health != 0)//boucle du jeu
 	{
+	
+		wrefresh(affichage);
 		while (win_condition(player, map1, player.coord_x, player.coord_y) == false)
 		{
+			
 			afficherMap(map1, player, creatures);
 			std::cout << "Ordonner votre avatar : ";
 			std::cin >> input;
@@ -315,5 +338,18 @@ int main()
 			return -1;
 		}
 	}
+	endwin();
 	return 0;
 }
+WINDOW* creation_display_ncurses(int height, int width, int start_y, int startx)
+{
+	WINDOW* local_win;
+
+	local_win = newwin(height, width, start_y, startx);
+	box(local_win, 0, 0);
+
+	wrefresh(local_win);
+
+	return local_win;
+}
+
