@@ -20,8 +20,6 @@ struct enemy
 {
 	entity monster;
 	int damage;
-	int current_x;
-	int current_y;
 };
 
 struct tile
@@ -70,7 +68,7 @@ void losinghealth(entity& player, enemy creatures[5]) //Calcule les dégats apr�
 {
 	for (int current_m = 0; current_m < 5; current_m++)
 	{
-		if (collidingenemy(creatures, player.coord_x, player.coord_y) == true)
+		if (collidingenemy(creatures, player.coord_x, player.coord_y))
 		{
 			player.health -= creatures[current_m].damage;
 		}
@@ -87,7 +85,7 @@ void afficherMap(int map[10][20], entity player, enemy creatures[5]) // Affiche 
 
 			for (int current_m = 0; current_m < 5; current_m++)
 			{
-				if (i == creatures[current_m].current_x && j == creatures[current_m].current_y)
+				if (i == creatures[current_m].monster.coord_x && j == creatures[current_m].monster.coord_y)
 				{
 					spawnenemy = true;
 					enemyexist = current_m;
@@ -161,14 +159,15 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis (aléa
 	int random = rand() % 4;
 	for (int current_m = 0; current_m < 5; current_m++)
 	{
+		srand(time(0));
 		if (random == 0 && creatures[current_m].monster.coord_x > 0)
 		{
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y) == false)
+				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y))
 				{
-					creatures[current_m].current_x -= 1;
+					creatures[current_m].monster.coord_x -= 1;
 				}
 			}
 		}
@@ -177,9 +176,9 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis (aléa
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x + 1, creatures[current_m].monster.coord_y);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y) == false)
+				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x + 1, creatures[current_m].monster.coord_y))
 				{
-					creatures[current_m].current_x += 1;
+					creatures[current_m].monster.coord_x += 1;
 				}
 
 			}
@@ -189,32 +188,24 @@ void creaturesM(enemy creatures[5], int map[10][20])//Deplacement ennemis (aléa
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1) == false)
+				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1))
 				{
-					creatures[current_m].current_y -= 1;
+					creatures[current_m].monster.coord_y -= 1;
 				}
 			}
 		}
-		else if (random == 0 && creatures[current_m].monster.coord_y < 19)
+		else if (random == 3 && creatures[current_m].monster.coord_y < 19)
 		{
 			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1);
 			if (Next_tile.traversal)
 			{
-				if (collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1) == false)
+				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1))
 				{
-					creatures[current_m].current_y += 1;
+					creatures[current_m].monster.coord_y += 1;
 				}
 
 			}
 		}
-	}
-}
-void creatures_update(enemy creatures[5]) // Change les anciennes coordonnées pour prendre en compte le déplacement
-{
-	for (int current_m = 0; current_m < 5; current_m++)
-	{
-		creatures[current_m].monster.coord_x = creatures[current_m].current_x;
-		creatures[current_m].monster.coord_y = creatures[current_m].current_y;
 	}
 }
 void storytime() // L'histoire qui se lance au début du jeu
@@ -226,53 +217,70 @@ void storytime() // L'histoire qui se lance au début du jeu
 		std::cout << "This world is a dream among many" << '\n';
 		std::cout << "The darkness has won its first battle against the mind" << '\n';
 		std::cout << "Go onto the boards, find the exit, and you will get salvation !";
-		std::cin >> input;
+		input = _getch();
 		system("cls");
 	}
+}
+bool load_map(const std::string& filename, int map[10][20])
+{
+	std::ifstream file(filename);
+	if (!file)
+	{
+		std::cout << "Impossible d'ouvrir " << filename << '\n';
+		return false;
+	}
+
+	std::string line;
+	for (int i = 0; i < x; i++)
+	{
+		if (!std::getline(file, line) || line.size() < y)
+		{
+			std::cout << "Ligne " << i << " invalide ou trop courte\n";
+			return false;
+		}
+
+		for (int j = 0; j < y; j++)
+		{
+			int value = -1;
+			for (int c = 0; c < 4; c++)
+			{
+				if (line[j] == tiles[c].name)
+					value = tiles[c].indice;
+			}
+
+			if (value == -1)
+			{
+				std::cout << "Caractère inconnu '" << line[j]
+					<< "' ligne " << i << ", colonne " << j << '\n';
+				return false;
+			}
+			map[i][j] = value;
+		}
+	}
+	return true;
 }
 
 int main()
 {
-	srand(time(0));
-	int map1[10][20] = //Premier plateau du jeu
-	{
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,2,2,2,3,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	};
-	int map2[10][20] = //Deuxième plateau du jeu
-	{
-	{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{2,0,0,0,1,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-	{2,0,0,0,1,0,0,1,1,1,3,1,1,0,0,0,0,0,0,1},
-	{2,0,2,2,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1},
-	{2,0,2,2,2,0,0,2,2,2,2,2,2,0,0,0,0,0,0,1},
-	{2,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	};
+	int map1[10][20];
+	if (!load_map("MAPS\\map1.txt", map1))
+		return 1;
+	int map2[10][20];	
+	if (!load_map("MAPS\\map2.txt", map2))
+		return 1;
 	enemy creatures[5] = {//Infos ennemies lvl 1
-		{1,8,'X',1,1,1,8},
-		{8,2 ,'X',1,1,8,2},
-		{8,17,'X',1,1,8,17},
-		{1,1 ,'X',1,1,1,1},
-		{5,10,'X',1,1,5,10}
+		{1,8,'X',1,1},
+		{8,2 ,'X',1,1},
+		{8,17,'X',1,1},
+		{1,1 ,'X',1,1},
+		{5,10,'X',1,1}
 	}; 
 	enemy creatures2[5] = {// Infos ennemis lvl2 
-		{2,8,'X',1,1,2,8},
-		{8,3 ,'X',1,1,8,3},
-		{8,15,'X',1,1,8,15},
-		{1,8 ,'X',1,1,1,8},
-		{3,10,'X',1,1,3,10}
+		{2,8,'X',1,1},
+		{8,3 ,'X',1,1},
+		{8,15,'X',1,1},
+		{1,8 ,'X',1,1},
+		{3,10,'X',1,1}
 	};
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
 	entity player2{ 2,2,'H',2 }; //Infos Joueur lvl 2
@@ -284,11 +292,10 @@ int main()
 		{
 			afficherMap(map1, player, creatures);
 			std::cout << "Ordonner votre avatar : ";
-			std::cin >> input;
+			input = _getch();
 			player_choice(player, input, map1);
 			losinghealth(player, creatures);
 			creaturesM(creatures, map1);
-			creatures_update(creatures);
 			losinghealth(player, creatures);
 			system("cls");
 			if (player.health <= 0)
@@ -301,18 +308,17 @@ int main()
 		std::cout << "LEVEL 1 COMPLETED !!!" << '\n';
 		std::cout << "MOVING TO NEXT LEVEL ?" << '\n';
 		std::cout << "<y> or <n> ?" << '\n';
-		std::cin >> input;
+		input = _getch();
 		if (input == 'y') {
 			system("cls");
 			while (win_condition(player2, map2, player2.coord_x, player2.coord_y) == false) // 2eme niveau
 			{
 				afficherMap(map2, player2, creatures2);
 				std::cout << "Ordonner votre avatar : ";
-				std::cin >> input;
+				input = _getch();
 				player_choice(player2, input, map2);
 				losinghealth(player2, creatures2);
 				creaturesM(creatures2, map2);
-				creatures_update(creatures2);
 				losinghealth(player2, creatures2);
 				system("cls");
 				if (player2.health <= 0)
