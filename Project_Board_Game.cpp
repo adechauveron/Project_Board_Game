@@ -222,7 +222,7 @@ void storytime(char input, int player_state) // L'histoire qui se lance au débu
 		std::cout << "And the world fell to darkness...";
 	}
 }
-bool load_map(const std::string& maps, int map[10][20])
+bool load_map(const std::string& maps, int map[x][y])
 {
 	std::ifstream file(maps); //lit le fichier
 	if (!file) //La fonction n'arrive pas à lire le fichier texte
@@ -307,7 +307,7 @@ int main()
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
 	entity player2{ 2,2,'H',2 }; //Infos Joueur lvl 2
 	char input = 'p';
-	storytime(input, 0); //Ecran de lancement + Lore 
+	storytime(input, gamestate); //Ecran de lancement + Lore 
 	while (gamestate != 666)//boucle du jeu
 	{
 		gamestate = level_playing(map1, creatures, player, input);
