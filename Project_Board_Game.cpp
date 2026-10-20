@@ -7,6 +7,7 @@
 
 static const int x = 10;
 static const int y = 20;
+static const int nb_enemies = 5;
 
 struct entity
 {
@@ -32,211 +33,176 @@ struct tile
 
 const tile water{ '~',1,false }; //Infos Tile Water
 const tile mountain{ 'M',2, false };//Infos Tile Mountain
-const tile ground{ '.',0, true,false};//Infos Tile Ground
-const tile win{'E',3,true,true}; // Infos Tile Win
-tile const tiles[4] = { ground, water, mountain, win}; //Tableau des différents types de Tiles
+const tile ground{ '.',0, true,false };//Infos Tile Ground
+const tile win{ 'E',3,true,true }; // Infos Tile Win
+tile const tiles[4] = { ground, water, mountain, win }; //Tableau des différents types de Tiles
+
 tile get_tile_at(int map[x][y], int coord_x, int coord_y) // Récupérer une tile aux coordonnées x et y
 {
-	int index = map[coord_x][coord_y];
-	tile current_tile = tiles[index];
-	return current_tile;
-} 
+	return tiles[map[coord_x][coord_y]];
+}
+
 bool win_condition(entity& player, int map[x][y], int coord_x, int coord_y) // vérifie la condition de victoire (atteindre E)
 {
-	tile win = get_tile_at(map, coord_x, coord_y);
-	if (win.win_cond == true)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-} 
-bool collidingenemy(enemy creatures[5], int coord_x, int coord_y) //Renvoie Vrai si un ennemi se trouve aux coordonnées x et y
+	return get_tile_at(map, coord_x, coord_y).win_cond;
+}
+
+bool still_alive(const enemy& creature) // Un ennemi est vivant tant qu'il lui reste de la vie
 {
-	for (int current_m = 0; current_m < 5; current_m++)
+	return creature.monster.health > 0;
+}
+
+bool collidingenemy(enemy creatures[nb_enemies], int coord_x, int coord_y) //Renvoie Vrai si un ennemi se trouve aux coordonnées x et y
+{
+	for (int current_m = 0; current_m < nb_enemies; current_m++)
 	{
-		if (coord_x == creatures[current_m].monster.coord_x && coord_y == creatures[current_m].monster.coord_y)
+		if (still_alive(creatures[current_m]) && coord_x == creatures[current_m].monster.coord_x && coord_y == creatures[current_m].monster.coord_y)
 		{
 			return true;
 		}
 	}
 	return false;
 }
-void losinghealth(entity& player, enemy creatures[5]) //Calcule les dégats après avoir touché un ennemi
+
+void losinghealth(entity& player, enemy creatures[nb_enemies]) //Calcule les dégats après avoir touché un ennemi
 {
-	for (int current_m = 0; current_m < 5; current_m++)
+	for (int current_m = 0; current_m < nb_enemies; current_m++)
 	{
 		if (collidingenemy(creatures, player.coord_x, player.coord_y))
 		{
-			player.health -= creatures[current_m].damage;
+			if (still_alive(creatures[current_m]) && player.coord_x == creatures[current_m].monster.coord_x && player.coord_y == creatures[current_m].monster.coord_y)
+			{
+				player.health -= creatures[current_m].damage;
+			}
 		}
 	}
 }
-void afficherMap(int map[x][y], entity player, enemy creatures[5]) // Affiche le plateau
+
+void showMap(int map[x][y],entity player, enemy creatures[nb_enemies]) // Affiche le plateau
 {
 	for (int i = 0; i < x; i++) //i = ligne
 	{
 		for (int j = 0; j < y; j++) //j = colonne
 		{
-			bool spawnenemy = false;
-			int enemyexist;
-
-			for (int current_m = 0; current_m < 5; current_m++)
+			int enemyexist = -1;
+			for (int current_m = 0; current_m < nb_enemies; current_m++)
 			{
 				if (i == creatures[current_m].monster.coord_x && j == creatures[current_m].monster.coord_y)
 				{
-					spawnenemy = true;
 					enemyexist = current_m;
 				}
 			}
-			if (spawnenemy)  //Place les monstres
+
+			if (enemyexist != -1) //Place les monstres
 			{
 				std::cout << creatures[enemyexist].monster.name << ' ';
 			}
-			else if (i == player.coord_x && j == player.coord_y) 
+			else if (i == player.coord_x && j == player.coord_y)
 			{
 				std::cout << player.name << ' '; //Place l'Avatar
 			}
 			else
 			{
-				for (int c = 0; c < 4; c++)
-				{
-					if (map[i][j] == tiles[c].indice) 
-					{
-						std::cout << tiles[c].name << ' '; //Place les tiles
-					}
-
-				}
+				std::cout << tiles[map[i][j]].name << ' '; //Place les tiles
 			}
 		}
 		std::cout << std::endl;
 	}
 }
-void player_choice(entity& player, char choice, int map[x][y])//Prend les Input du Joueur et les interprète en déplacements
+
+void move_entity(entity& entity, char direction, int map[x][y], enemy* creatures = nullptr)
 {
-	if (choice == 'z' && player.coord_x > x-x)
+	int directionx = 0;
+	int directiony = 0;
+
+	switch (direction)
 	{
-		tile Next_tile = get_tile_at(map, player.coord_x - 1, player.coord_y);
-		if (Next_tile.traversal)
+		case 'z':
 		{
-			player.coord_x --;
+			directionx = -1;
+			break;
+		}
+		case 's':
+		{
+			directionx = 1;
+			break;
+		}
+		case 'q':
+		{
+			directiony = -1;
+			break;
+		}
+		case 'd':
+		{
+			directiony = 1;
+			break;
+		}
+		default:
+		{ 
+			return; 
 		}
 	}
-	else if (choice == 's' && player.coord_x < x-1)
+	int movement_x = entity.coord_x + directionx;
+	int movement_y = entity.coord_y + directiony;
+
+	if (movement_x < 0 || movement_x >= x || movement_y < 0 || movement_y >= y) // hors du plateau
 	{
-		{
-			tile Next_tile = get_tile_at(map, player.coord_x + 1, player.coord_y);
-			if (Next_tile.traversal)
-			{
-				player.coord_x ++;
-			}
-		}
+		return;
 	}
-	else if (choice == 'q' && player.coord_y > y-y)
+	if (!get_tile_at(map, movement_x, movement_y).traversal) // tile non traversable
 	{
-		tile Next_tile = get_tile_at(map, player.coord_x, player.coord_y - 1);
-		if (Next_tile.traversal)
-		{
-			player.coord_y --;
-		}
+		return;
+	}
+	if (creatures != nullptr && collidingenemy(creatures, movement_x, movement_y)) // case déjà occupée par un ennemi
+	{
+		return;
 	}
 
-	else if (choice == 'd' && player.coord_y < y-1)
-	{
-		tile Next_tile = get_tile_at(map, player.coord_x, player.coord_y + 1);
-		if (Next_tile.traversal)
-		{
-			player.coord_y ++;
-		}
+	entity.coord_x = movement_x;
+	entity.coord_y = movement_y;
+}
 
+void creaturesMove(enemy creatures[nb_enemies], int map[x][y])//Deplacement ennemis (aléatoire)
+{
+	static const char directions[4] = { 'z', 's', 'q', 'd' };
+	for (int current_m = 0; current_m < nb_enemies; current_m++)
+	{
+		move_entity(creatures[current_m].monster, directions[rand() % 4], map, creatures); //utilse move_entity en revoyant un char au hasard
 	}
 }
-void creaturesM(enemy creatures[5], int map[x][y])//Deplacement ennemis (aléatoire)
-{
-	for (int current_m = 0; current_m < 5; current_m++)
-	{
-		int random = rand() % 4;
-		if (random == 0 && creatures[current_m].monster.coord_x > x-x)
-		{
-			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y);
-			if (Next_tile.traversal)
-			{
-				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x - 1, creatures[current_m].monster.coord_y))
-				{
-					creatures[current_m].monster.coord_x --;
-				}
-			}
-		}
-		else if (random == 1 && creatures[current_m].monster.coord_x < x-1)
-		{
-			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x + 1, creatures[current_m].monster.coord_y);
-			if (Next_tile.traversal)
-			{
-				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x + 1, creatures[current_m].monster.coord_y))
-				{
-					creatures[current_m].monster.coord_x ++;
-				}
 
-			}
-		}
-		else if (random == 2 && creatures[current_m].monster.coord_y > y-y)
-		{
-			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1);
-			if (Next_tile.traversal)
-			{
-				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y - 1))
-				{
-					creatures[current_m].monster.coord_y --;
-				}
-			}
-		}
-		else if (random == 3 && creatures[current_m].monster.coord_y < x-1)
-		{
-			tile Next_tile = get_tile_at(map, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1);
-			if (Next_tile.traversal)
-			{
-				if (!collidingenemy(creatures, creatures[current_m].monster.coord_x, creatures[current_m].monster.coord_y + 1))
-				{
-					creatures[current_m].monster.coord_y ++;
-				}
-
-			}
-		}
-	}
-}
 void storytime(char input, int player_state) // L'histoire qui se lance au début du jeu
 {
-	if (input == 'p' && player_state == 0)
+	if (input == 'p' && player_state == 0) //L'histoire est affichée jusqu'à ce que le joueur presse une touche
 	{
-		std::cout << "BOARD OF DREAMS" << '\n';
-		std::cout << "This world is a dream among many" << '\n';
-		std::cout << "The darkness has won its first battle against the mind" << '\n';
-		std::cout << "Go onto the boards, find the exit, and you will get salvation !";
+		std::cout << "BOARD OF DREAMS" << std::endl;
+		std::cout << "This world is a dream among many" << std::endl;
+		std::cout << "The darkness has won its first battle against the mind" << std::endl;
+		std::cout << "Go onto the boards, find the exit, and obtain salvation !";
 		input = _getch();
 		system("cls");
 	}
-	else if (player_state == 666)
+	else if (player_state == 666) //Game Over
 	{
 		std::cout << "And the world fell to darkness...";
 	}
 }
+
 bool load_map(const std::string& maps, int map[x][y])
 {
 	std::ifstream file(maps); //lit le fichier
 	if (!file) //La fonction n'arrive pas à lire le fichier texte
 	{
-		std::cout << "Impossible d'ouvrir " << maps << '\n';
+		std::cout << "Impossible d'ouvrir " << maps << std::endl;
 		return false;
 	}
 
 	std::string line; //Initie la ligne de texte
-	for (int i = 0; i < x; i++) 
+	for (int i = 0; i < x; i++)
 	{
 		if (!std::getline(file, line) || line.size() < y) //verifie s'il peut pas atteindre la ligne et si la taille de la ligne est correcte
 		{
-			std::cout << "Ligne " << i << " invalide ou trop courte\n";
+			std::cout << "Ligne " << i << " invalide ou trop courte" << std::endl;
 			return false;
 		}
 
@@ -252,7 +218,7 @@ bool load_map(const std::string& maps, int map[x][y])
 			if (value == -1)
 			{
 				std::cout << "Caractère inconnu '" << line[j]
-					<< "' ligne " << i << ", colonne " << j << '\n';
+					<< "' ligne " << i << ", colonne " << j << std::endl;
 				return false;
 			}
 			map[i][j] = value;
@@ -261,15 +227,15 @@ bool load_map(const std::string& maps, int map[x][y])
 	return true;
 }
 
-int level_playing(int map[x][y], enemy *creatures, entity player, char input) //Lance le level
+int level_playing(int map[x][y], enemy* creatures, entity player) //Lance le level
 {
-	while (win_condition(player, map, player.coord_x, player.coord_y) == false)
+	while (win_condition(player, map, player.coord_x, player.coord_y) == false) //Tant que la case Win n'est pas atteinte la boucle de jeu continue !
 	{
-		afficherMap(map, player, creatures);
-		input = _getch();
-		player_choice(player, input, map);
+		showMap(map, player, creatures);
+		char input = _getch();
+		move_entity(player, input, map);
 		losinghealth(player, creatures);
-		creaturesM(creatures, map);
+		creaturesMove(creatures, map);
 		losinghealth(player, creatures);
 		system("cls");
 		if (player.health <= 0)
@@ -290,36 +256,45 @@ int main()
 	int map2[x][y];
 	if (!load_map("MAPS\\map2.txt", map2))
 		return -1;
-	enemy creatures[5] = {//Infos ennemies lvl 1
+	enemy creatures[nb_enemies] = {//Infos ennemies lvl 1
 		{1,8,'X',1,1},
 		{8,2 ,'X',1,1},
 		{8,17,'X',1,1},
 		{1,1 ,'X',1,1},
 		{5,10,'X',1,1}
 	};
-	enemy creatures2[5] = {// Infos ennemis lvl2 
+	enemy creatures2[nb_enemies] = {// Infos ennemis lvl2 
 		{2,8,'X',1,1},
 		{8,3 ,'X',1,1},
 		{8,18,'X',1,1},
 		{1,8 ,'X',1,1},
-		{3,10,'X',1,1}
+		{6,9,'X',1,1}
 	};
 	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
 	entity player2{ 2,2,'H',2 }; //Infos Joueur lvl 2
-	char input = 'p';
+	char input = 'p';//Initie l'input qui va lancer le storytime
 	storytime(input, gamestate); //Ecran de lancement + Lore 
-	while (gamestate != 666)//boucle du jeu
+	while (gamestate != 666)//boucle du jeu jusqu'à Game Over
 	{
-		gamestate = level_playing(map1, creatures, player, input);
-		if (gamestate == 1)
+		gamestate = level_playing(map1, creatures, player);
+
+		switch (gamestate)
 		{
-			gamestate = level_playing(map2, creatures2, player2, input);
+		case 1: // niveau 1 réussi -> niveau 2
+			gamestate = level_playing(map2, creatures2, player2);
+			if (gamestate == 1) // niveau 2 réussi -> victoire (projet en cours)
+			{
+				system("cls");
+				std::cout << "Salvation Obtained"<< std::endl;
+				std::cout << "Was it w"<< std::endl;
+				return 42;
+			}
+			break;
+		default: // 666 : le joueur est mort, la boucle s'arrête
+			break;
 		}
-		system("cls");
-		std::cout << "you win";
-		return -1;
 	}
 	system("cls");
-	storytime(input, gamestate);
+	storytime('p', gamestate);
 	return 666;
 }
