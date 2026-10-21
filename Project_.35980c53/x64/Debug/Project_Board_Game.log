@@ -1,4 +1,9 @@
 ﻿  Project_Board_Game.cpp
+<<<<<<< Updated upstream
 C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\Project_Board_Game.cpp(233,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
 C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\Project_Board_Game.cpp(280,6): warning C4101: 'ch' : variable locale non référencée
   Project_Board_Game.vcxproj -> C:\Users\adechauveron\source\repos\Project_Board_Game\Project_Board_Game\x64\Debug\Project_Board_Game.exe
+=======
+C:\Users\26269\Documents\GitHub\Project_Board_Game\Project_Board_Game.cpp(401,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+  Project_Board_Game.vcxproj -> C:\Users\26269\Documents\GitHub\Project_Board_Game\x64\Debug\Project_Board_Game.exe
+>>>>>>> Stashed changes
