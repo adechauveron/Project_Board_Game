@@ -42,6 +42,7 @@ const tile water{ '~',1,false }; //Infos Tile Water
 const tile mountain{ 'M',2, false };//Infos Tile Mountain
 const tile ground{ '.',0, true,false };//Infos Tile Ground
 const tile win{ 'E',3,true,true }; // Infos Tile Win
+
 tile const tiles[4] = { ground, water, mountain, win }; //Tableau des différents types de Tiles
 const level levels[] = {
 	{
@@ -59,7 +60,7 @@ const level levels[] = {
 		"MAPS\\map2.txt",//Niveau 2
 		{ 2,2,'H',2 },//joueur2
 		{
-			{2,8,'X',1,1},//créatures niveau2
+			{2,18,'X',1,1},//créatures niveau2
 			{8,3,'X',1,1},
 			{8,18,'X',1,1},
 			{1,8,'X',1,1},
@@ -77,7 +78,7 @@ const level levels[] = {
 		{2,18,'X',1,1}}
 	}
 };
-const int nb_levels = sizeof(levels) / sizeof(levels[0]);
+const int nb_levels = 3;
 
 tile get_tile_at(int map[x][y], int coord_x, int coord_y) // Récupérer une tile aux coordonnées x et y
 {
@@ -112,7 +113,7 @@ void losinghealth(entity& player, enemy creatures[nb_enemies]) //Calcule les dé
 	{
 		if (collidingenemy(creatures, player.coord_x, player.coord_y))
 		{
-			if (still_alive(creatures[current_m]) && player.coord_x == creatures[current_m].monster.coord_x && player.coord_y == creatures[current_m].monster.coord_y)
+			if (still_alive(creatures[current_m]))
 			{
 				player.health -= creatures[current_m].damage;
 			}
@@ -145,7 +146,7 @@ void showMap(int map[x][y],entity player, enemy creatures[nb_enemies]) // Affich
 			}
 			else
 			{
-				std::cout << tiles[map[i][j]].name << ' '; //Place les tiles
+				std::cout << tiles[map[i][j]].name<< ' '; //Place les tiles (.name -> caractères symbolisant la tile)
 			}
 		}
 		std::cout << std::endl;
@@ -195,7 +196,7 @@ void move_entity(entity& entity, char direction, int map[x][y], enemy* creatures
 	{
 		return;
 	}
-	if (creatures != nullptr && collidingenemy(creatures, movement_x, movement_y)) // case déjà occupée par un ennemi
+	if (creatures != nullptr && collidingenemy(creatures, movement_x, movement_y)) // case déjà occupée par un ennemi -> fonctionne seulement quand la fonction reçoit un tableau de struct enemy
 	{
 		return;
 	}
@@ -224,22 +225,36 @@ void storytime(char input, int player_state) // L'histoire qui se lance au débu
 		input = _getch();
 		system("cls");
 	}
+	else if (player_state == 1)
+	{
+		std::cout << "The mountains of Apocrypha..." << std::endl;
+		std::cout << "Be careful of the cave inside, you might get ambushed !" << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 2)
+	{
+		std::cout << "The maze of Darraen..." << std::endl;
+		std::cout << "Carefullness and patience might be your greatest ally..." << std::endl;
+		input = _getch();
+		system("cls");
+	}
 	else if (player_state == 666) //Game Over
 	{
 		std::cout << "And the world fell to darkness...";
 	}
 }
 
-bool load_map(const std::string& maps, int map[x][y])
+bool load_map(const std::string& access, int map[x][y])
 {
-	std::ifstream file(maps); //lit le fichier
+	std::ifstream file(access); //lit le fichier
 	if (!file) //La fonction n'arrive pas à lire le fichier texte
 	{
-		std::cout << "Impossible d'ouvrir " << maps << std::endl;
+		std::cout << "Impossible d'ouvrir " << access << std::endl;
 		return false;
 	}
 
-	std::string line; //Initie la ligne de texte
+	std::string line; //crée la variable line qui va contenir les caractères
 	for (int i = 0; i < x; i++)
 	{
 		if (!std::getline(file, line) || line.size() < y) //verifie s'il peut pas atteindre la ligne et si la taille de la ligne est correcte
@@ -254,7 +269,9 @@ bool load_map(const std::string& maps, int map[x][y])
 			for (int c = 0; c < 4; c++)
 			{
 				if (line[j] == tiles[c].name)
+				{
 					value = tiles[c].indice;
+				}
 			}
 
 			if (value == -1)
@@ -271,7 +288,7 @@ bool load_map(const std::string& maps, int map[x][y])
 
 
 
-int level_playing(int map[x][y], enemy* creatures, entity player,Item item) //Lance le level
+int level_playing(int map[x][y], enemy* creatures, entity player) //Lance le level
 {
 	while (win_condition( map, player.coord_x, player.coord_y) == false) //Tant que la case Win n'est pas atteinte la boucle de jeu continue !
 	{
@@ -297,19 +314,19 @@ int main()
 
 	char input = 'p';//Initie l'input qui va lancer le storytime
 	storytime(input, 0); //Ecran de lancement + Lore 
-	for (int current_level = 0; current_level < nb_levels; current_level++) // les niveaux s'enchainent
+	for (int current_level = 0; current_level < nb_levels; current_level++) // Pour chaque niveau
 	{
 		int map[x][y];
 		if (!load_map(levels[current_level].map_file, map))
 			return -1;
 
 		enemy creatures[nb_enemies];
-		for (int i = 0; i < nb_enemies; i++)
+		for (int current_m = 0; current_m < nb_enemies; current_m++)
 		{
-			creatures[i] = levels[current_level].creatures[i];
+			creatures[current_m] = levels[current_level].creatures[current_m];//On prend le bon tableau de créatures
 		}
 
-		int gamestate = level_playing(map, creatures, levels[current_level].player,Swimming_Getup);
+		int gamestate = level_playing(map, creatures, levels[current_level].player);
 
 		if (gamestate == 666) // le joueur est mort -> Game Over
 		{
@@ -317,6 +334,10 @@ int main()
 			storytime('p', gamestate);
 			return 666;
 		}
-
+		gamestate += current_level;
+		storytime(input, gamestate);
 	}
+	system("cls");
+	std::cout << "Salvation Obtained !";
+	return 10;
 }
