@@ -31,18 +31,60 @@ struct tile
 	bool win_cond = false;
 };
 
+struct level
+{
+	std::string map_file;
+	entity player;
+	enemy creatures[nb_enemies];
+};
+
 const tile water{ '~',1,false }; //Infos Tile Water
 const tile mountain{ 'M',2, false };//Infos Tile Mountain
 const tile ground{ '.',0, true,false };//Infos Tile Ground
 const tile win{ 'E',3,true,true }; // Infos Tile Win
 tile const tiles[4] = { ground, water, mountain, win }; //Tableau des différents types de Tiles
+const level levels[] = {
+	{
+		"MAPS\\map1.txt",//Niveau 1
+		{ 2,4,'H',1 },//joueur1
+		{
+			{1,8,'X',1,1},//créatures niveau1
+			{8,2,'X',1,1},
+			{8,17,'X',1,1},
+			{1,1,'X',1,1},
+			{5,10,'X',1,1}
+		}
+	},
+	{
+		"MAPS\\map2.txt",//Niveau 2
+		{ 2,2,'H',2 },//joueur2
+		{
+			{2,8,'X',1,1},//créatures niveau2
+			{8,3,'X',1,1},
+			{8,18,'X',1,1},
+			{1,8,'X',1,1},
+			{6,9,'X',1,1}
+		}
+	},
+	{	
+		"MAPS\\map3.txt",//Niveau 3
+		{0,0,'H',1},//joueur3
+	{
+		{3,9,'X',1,1},//créatures niveau3
+		{9,3,'X',1,1},
+		{5,10,'X',1,1},
+		{7,8,'X',1,1},
+		{2,18,'X',1,1}}
+	}
+};
+const int nb_levels = sizeof(levels) / sizeof(levels[0]);
 
 tile get_tile_at(int map[x][y], int coord_x, int coord_y) // Récupérer une tile aux coordonnées x et y
 {
 	return tiles[map[coord_x][coord_y]];
 }
 
-bool win_condition(entity& player, int map[x][y], int coord_x, int coord_y) // vérifie la condition de victoire (atteindre E)
+bool win_condition(int map[x][y], int coord_x, int coord_y) // vérifie la condition de victoire (atteindre E)
 {
 	return get_tile_at(map, coord_x, coord_y).win_cond;
 }
@@ -227,9 +269,11 @@ bool load_map(const std::string& maps, int map[x][y])
 	return true;
 }
 
-int level_playing(int map[x][y], enemy* creatures, entity player) //Lance le level
+
+
+int level_playing(int map[x][y], enemy* creatures, entity player,Item item) //Lance le level
 {
-	while (win_condition(player, map, player.coord_x, player.coord_y) == false) //Tant que la case Win n'est pas atteinte la boucle de jeu continue !
+	while (win_condition( map, player.coord_x, player.coord_y) == false) //Tant que la case Win n'est pas atteinte la boucle de jeu continue !
 	{
 		showMap(map, player, creatures);
 		char input = _getch();
@@ -246,55 +290,33 @@ int level_playing(int map[x][y], enemy* creatures, entity player) //Lance le lev
 	return 1;
 }
 
+
 int main()
 {
 	srand(time(0));
-	int gamestate = 0;
-	int map1[x][y];
-	if (!load_map("MAPS\\map1.txt", map1))
-		return -1;
-	int map2[x][y];
-	if (!load_map("MAPS\\map2.txt", map2))
-		return -1;
-	enemy creatures[nb_enemies] = {//Infos ennemies lvl 1
-		{1,8,'X',1,1},
-		{8,2 ,'X',1,1},
-		{8,17,'X',1,1},
-		{1,1 ,'X',1,1},
-		{5,10,'X',1,1}
-	};
-	enemy creatures2[nb_enemies] = {// Infos ennemis lvl2 
-		{2,8,'X',1,1},
-		{8,3 ,'X',1,1},
-		{8,18,'X',1,1},
-		{1,8 ,'X',1,1},
-		{6,9,'X',1,1}
-	};
-	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
-	entity player2{ 2,2,'H',2 }; //Infos Joueur lvl 2
-	char input = 'p';//Initie l'input qui va lancer le storytime
-	storytime(input, gamestate); //Ecran de lancement + Lore 
-	while (gamestate != 666)//boucle du jeu jusqu'à Game Over
-	{
-		gamestate = level_playing(map1, creatures, player);
 
-		switch (gamestate)
+	char input = 'p';//Initie l'input qui va lancer le storytime
+	storytime(input, 0); //Ecran de lancement + Lore 
+	for (int current_level = 0; current_level < nb_levels; current_level++) // les niveaux s'enchainent
+	{
+		int map[x][y];
+		if (!load_map(levels[current_level].map_file, map))
+			return -1;
+
+		enemy creatures[nb_enemies];
+		for (int i = 0; i < nb_enemies; i++)
 		{
-		case 1: // niveau 1 réussi -> niveau 2
-			gamestate = level_playing(map2, creatures2, player2);
-			if (gamestate == 1) // niveau 2 réussi -> victoire (projet en cours)
-			{
-				system("cls");
-				std::cout << "Salvation Obtained"<< std::endl;
-				std::cout << "Was it w"<< std::endl;
-				return 42;
-			}
-			break;
-		default: // 666 : le joueur est mort, la boucle s'arrête
-			break;
+			creatures[i] = levels[current_level].creatures[i];
 		}
+
+		int gamestate = level_playing(map, creatures, levels[current_level].player,Swimming_Getup);
+
+		if (gamestate == 666) // le joueur est mort -> Game Over
+		{
+			system("cls");
+			storytime('p', gamestate);
+			return 666;
+		}
+
 	}
-	system("cls");
-	storytime('p', gamestate);
-	return 666;
 }

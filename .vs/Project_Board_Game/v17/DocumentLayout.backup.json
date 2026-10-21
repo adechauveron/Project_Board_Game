@@ -13,25 +13,31 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "DockedWidth": 223,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Project_Board_Game.cpp",
               "DocumentMoniker": "C:\\Users\\adechauveron\\source\\repos\\Nouveau dossier\\Project_Board_Game\\Project_Board_Game.cpp",
               "RelativeDocumentMoniker": "Project_Board_Game.cpp",
-              "ToolTip": "C:\\Users\\adechauveron\\source\\repos\\Nouveau dossier\\Project_Board_Game\\Project_Board_Game.cpp",
-              "RelativeToolTip": "Project_Board_Game.cpp",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAEEAAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\adechauveron\\source\\repos\\Nouveau dossier\\Project_Board_Game\\Project_Board_Game.cpp*",
+              "RelativeToolTip": "Project_Board_Game.cpp*",
+              "ViewState": "AgIAAIQAAAAAAAAAAAAuwLEAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-10-12T12:43:45.625Z",
               "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 177,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{4cc3c4b2-75f8-4e41-a7d4-15c3f7c5b17a}"
             }
           ]
         }
