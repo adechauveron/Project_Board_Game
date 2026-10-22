@@ -219,11 +219,20 @@ void move_entity(entity& entity, char direction, const grid& map, const std::vec
 
 	switch (direction)
 	{
-	case 'z': directionx = -1; break;
-	case 's': directionx = 1; break;
-	case 'q': directiony = -1; break;
-	case 'd': directiony = 1; break;
-	default: return;
+	case 'z': 
+		directionx = -1;
+		break;
+	case 's': 
+		directionx = 1;
+		break;
+	case 'q': 
+		directiony = -1; 
+		break;
+	case 'd': 
+		directiony = 1; 
+		break;
+	default: 
+		return;
 	}
 
 	int new_x = entity.coord_x + directionx;
