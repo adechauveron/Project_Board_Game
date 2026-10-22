@@ -1,3 +1,2 @@
 ﻿  Project_Board_Game.cpp
-C:\Users\adechauveron\source\repos\Nouveau dossier\Project_Board_Game\Project_Board_Game.cpp(251,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-  Project_Board_Game.vcxproj -> C:\Users\adechauveron\source\repos\Nouveau dossier\Project_Board_Game\x64\Debug\Project_Board_Game.exe
+  Project_Board_Game.vcxproj -> C:\Users\26269\Documents\GitHub\Project_Board_Game\x64\Debug\Project_Board_Game.exe

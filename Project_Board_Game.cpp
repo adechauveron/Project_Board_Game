@@ -3,16 +3,15 @@
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <vector>
 #include <conio.h>
 
-static const int x = 10;
-static const int y = 20;
-static const int nb_enemies = 5;
+using grid = std::vector<std::vector<int>>;
 
 struct entity
 {
 	int coord_x;
-	int coord_y;
+	int coord_y; 
 	char name;
 	int health;
 };
@@ -29,151 +28,112 @@ struct tile
 	int indice;
 	bool traversal;
 	bool win_cond = false;
+	int damage = 0;
 };
 
-const tile water{ '~',1,false }; //Infos Tile Water
-const tile mountain{ 'M',2, false };//Infos Tile Mountain
-const tile ground{ '.',0, true,false };//Infos Tile Ground
-const tile win{ 'E',3,true,true }; // Infos Tile Win
-tile const tiles[4] = { ground, water, mountain, win }; //Tableau des différents types de Tiles
+struct level
+{
+	std::string map_file;
+	int player_health;
+};
 
-tile get_tile_at(int map[x][y], int coord_x, int coord_y) // Récupérer une tile aux coordonnées x et y
+
+static const char player_char = 'H';
+static const char enemy_char = 'X';
+
+static const int enemy_health = 1;
+static const int enemy_damage = 1;
+
+const tile water{ '~', 1, false };
+const tile mountain{ 'M', 2, false };
+const tile ground{ '.', 0, true };
+const tile win{ 'E', 3, true, true };
+const tile lava{ '#', 4, true, false, 1 };
+
+const int nb_tiles = 5;
+const tile tiles[nb_tiles] = { ground, water, mountain, win, lava }; // l'indice dans le tableau = tile.indice
+
+const level levels[] = {
+	{ "MAPS\\map0.txt", 1 },
+	{ "MAPS\\map1.txt", 1 },
+	{ "MAPS\\map2.txt", 1 },
+	{ "MAPS\\map3.txt", 1 },
+	{ "MAPS\\map4.txt", 1 },
+	{ "MAPS\\map5.txt", 2 },
+	{ "MAPS\\map7.txt", 2 },
+	{ "MAPS\\map8.txt", 2 },
+	{"MAPS\\map9.txt", 3 }
+};
+const int nb_levels = 10;
+
+
+
+int map_height(const grid& map) { return static_cast<int>(map.size()); }
+int map_width(const grid& map) { return static_cast<int>(map[0].size()); }
+
+tile get_tile_at(const grid& map, int coord_x, int coord_y)
 {
 	return tiles[map[coord_x][coord_y]];
 }
 
-bool win_condition(entity& player, int map[x][y], int coord_x, int coord_y) // vérifie la condition de victoire (atteindre E)
+bool win_condition(const grid& map, int coord_x, int coord_y) // vrai si le joueur est sur la case E
 {
 	return get_tile_at(map, coord_x, coord_y).win_cond;
 }
 
-bool still_alive(const enemy& creature) // Un ennemi est vivant tant qu'il lui reste de la vie
+bool collidingenemy(const std::vector<enemy>& creatures, int coord_x, int coord_y)
 {
-	return creature.monster.health > 0;
-}
-
-bool collidingenemy(enemy creatures[nb_enemies], int coord_x, int coord_y) //Renvoie Vrai si un ennemi se trouve aux coordonnées x et y
-{
-	for (int current_m = 0; current_m < nb_enemies; current_m++)
+	for (const enemy& creature : creatures)
 	{
-		if (still_alive(creatures[current_m]) && coord_x == creatures[current_m].monster.coord_x && coord_y == creatures[current_m].monster.coord_y)
+		if (creature.monster.coord_x == coord_x && creature.monster.coord_y == coord_y)
 		{
 			return true;
 		}
 	}
 	return false;
 }
-
-void losinghealth(entity& player, enemy creatures[nb_enemies]) //Calcule les dégats après avoir touché un ennemi
+void take_tile_damage(entity& player, const grid& map)
 {
-	for (int current_m = 0; current_m < nb_enemies; current_m++)
+	player.health -= get_tile_at(map, player.coord_x, player.coord_y).damage;
+}
+
+void losinghealth(entity& player, const std::vector<enemy>& creatures)
+{
+	for (const enemy& creature : creatures)
 	{
-		if (collidingenemy(creatures, player.coord_x, player.coord_y))
+		if (creature.monster.coord_x == player.coord_x && creature.monster.coord_y == player.coord_y)
 		{
-			if (still_alive(creatures[current_m]) && player.coord_x == creatures[current_m].monster.coord_x && player.coord_y == creatures[current_m].monster.coord_y)
-			{
-				player.health -= creatures[current_m].damage;
-			}
+			player.health -= creature.damage;
 		}
 	}
 }
 
-void showMap(int map[x][y],entity player, enemy creatures[nb_enemies]) // Affiche le plateau
+void showMap(const grid& map, const entity& player, const std::vector<enemy>& creatures)
 {
-	for (int i = 0; i < x; i++) //i = ligne
+	for (int i = 0; i < map_height(map); i++) // i = ligne
 	{
-		for (int j = 0; j < y; j++) //j = colonne
+		for (int j = 0; j < map_width(map); j++) // j = colonne
 		{
-			int enemyexist = -1;
-			for (int current_m = 0; current_m < nb_enemies; current_m++)
+			if (collidingenemy(creatures, i, j))
 			{
-				if (i == creatures[current_m].monster.coord_x && j == creatures[current_m].monster.coord_y)
-				{
-					enemyexist = current_m;
-				}
-			}
-
-			if (enemyexist != -1) //Place les monstres
-			{
-				std::cout << creatures[enemyexist].monster.name << ' ';
+				std::cout << enemy_char << ' ';
 			}
 			else if (i == player.coord_x && j == player.coord_y)
 			{
-				std::cout << player.name << ' '; //Place l'Avatar
+				std::cout << player_char << ' ';
 			}
 			else
 			{
-				std::cout << tiles[map[i][j]].name << ' '; //Place les tiles
+				std::cout << get_tile_at(map, i, j).name << ' ';
 			}
 		}
 		std::cout << std::endl;
 	}
 }
 
-void move_entity(entity& entity, char direction, int map[x][y], enemy* creatures = nullptr)
+void storytime(char input, int player_state) // Textes d'histoire
 {
-	int directionx = 0;
-	int directiony = 0;
-
-	switch (direction)
-	{
-		case 'z':
-		{
-			directionx = -1;
-			break;
-		}
-		case 's':
-		{
-			directionx = 1;
-			break;
-		}
-		case 'q':
-		{
-			directiony = -1;
-			break;
-		}
-		case 'd':
-		{
-			directiony = 1;
-			break;
-		}
-		default:
-		{ 
-			return; 
-		}
-	}
-	int movement_x = entity.coord_x + directionx;
-	int movement_y = entity.coord_y + directiony;
-
-	if (movement_x < 0 || movement_x >= x || movement_y < 0 || movement_y >= y) // hors du plateau
-	{
-		return;
-	}
-	if (!get_tile_at(map, movement_x, movement_y).traversal) // tile non traversable
-	{
-		return;
-	}
-	if (creatures != nullptr && collidingenemy(creatures, movement_x, movement_y)) // case déjà occupée par un ennemi
-	{
-		return;
-	}
-
-	entity.coord_x = movement_x;
-	entity.coord_y = movement_y;
-}
-
-void creaturesMove(enemy creatures[nb_enemies], int map[x][y])//Deplacement ennemis (aléatoire)
-{
-	static const char directions[4] = { 'z', 's', 'q', 'd' };
-	for (int current_m = 0; current_m < nb_enemies; current_m++)
-	{
-		move_entity(creatures[current_m].monster, directions[rand() % 4], map, creatures); //utilse move_entity en revoyant un char au hasard
-	}
-}
-
-void storytime(char input, int player_state) // L'histoire qui se lance au début du jeu
-{
-	if (input == 'p' && player_state == 0) //L'histoire est affichée jusqu'à ce que le joueur presse une touche
+	if (input == 'p' && player_state == 0)
 	{
 		std::cout << "BOARD OF DREAMS" << std::endl;
 		std::cout << "This world is a dream among many" << std::endl;
@@ -182,58 +142,216 @@ void storytime(char input, int player_state) // L'histoire qui se lance au débu
 		input = _getch();
 		system("cls");
 	}
-	else if (player_state == 666) //Game Over
+	else if (player_state == 1)
+	{
+		std::cout << "The temple of Heinshfault..." << std::endl;
+		std::cout << "Be careful of the creatures here, one touch will be fatal..." << std::endl;
+		input = _getch();
+		system("cls");
+	}	
+	else if (player_state == 2)
+	{
+		std::cout << "The mountains of Apocrypha..." << std::endl;
+		std::cout << "Be careful of the cave inside, you might get ambushed !" << std::endl;
+		std::cout << "The lava is unforgiving as well..." << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 3)
+	{
+		std::cout << "The maze of Darraen..." << std::endl;
+		std::cout << "Carefullness and patience might be your greatest ally..." << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 4)
+	{
+		std::cout << "The lava fields of Saria..." << std::endl;
+		std::cout << "Creatures are in their habitat, they care not for the dangerous heat..." << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 5)
+	{
+		std::cout << "A sanctuary of peace, Finally some respite" << std::endl;
+		std::cout << "You earned an additionnal point of health !" << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 6)
+	{
+		std::cout << "The maze of Jaggar" << std::endl;
+		std::cout << "I can only wish you good luck on your endeavours." << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 7)
+	{
+		std::cout << "The maze of Varrion" << std::endl;
+		std::cout << "You're growing closer to your goal, just a little bit more.." << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 8)
+	{
+		std::cout << "Even this haven of peace has been ruined by this heat of destruction... I wish you good luck." << std::endl;
+		std::cout << "You earned an additionnal point of health !" << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 9)
+	{
+		std::cout << "The Maze of ##########, its name has been forgotten to the abyss of knowledge" << std::endl;
+		std::cout << "The story is over, for both of you. May you find Salvation." << std::endl;
+		input = _getch();
+		system("cls");
+	}
+	else if (player_state == 666) // Game Over
 	{
 		std::cout << "And the world fell to darkness...";
 	}
 }
 
-bool load_map(const std::string& maps, int map[x][y])
+void move_entity(entity& entity, char direction, const grid& map, const std::vector<enemy>* creatures = nullptr)
 {
-	std::ifstream file(maps); //lit le fichier
-	if (!file) //La fonction n'arrive pas à lire le fichier texte
+	int directionx = 0;
+	int directiony = 0;
+
+	switch (direction)
 	{
-		std::cout << "Impossible d'ouvrir " << maps << std::endl;
+	case 'z': directionx = -1; break;
+	case 's': directionx = 1; break;
+	case 'q': directiony = -1; break;
+	case 'd': directiony = 1; break;
+	default: return;
+	}
+
+	int new_x = entity.coord_x + directionx;
+	int new_y = entity.coord_y + directiony;
+
+	bool outside = new_x < 0 || new_x >= map_height(map) || new_y < 0 || new_y >= map_width(map);
+	if (outside)
+	{
+		return;
+	}
+	if (!get_tile_at(map, new_x, new_y).traversal)
+	{
+		return;
+	}
+	if (creatures != nullptr && collidingenemy(*creatures, new_x, new_y))
+	{
+		return;
+	}
+
+	entity.coord_x = new_x;
+	entity.coord_y = new_y;
+}
+
+void creaturesMove(std::vector<enemy>& creatures, const grid& map) // Déplacement aléatoire des ennemis
+{
+	static const char directions[4] = { 'z', 's', 'q', 'd' };
+	for (enemy& creature : creatures)
+	{
+		move_entity(creature.monster, directions[rand() % 4], map, &creatures);
+	}
+}
+
+
+int find_tile_index(char c) // Renvoie l'indice de la tile correspondant au caractère, ou -1 si le caractère est inconnu
+{
+	for (int i = 0; i < nb_tiles; i++)
+	{
+		if (tiles[i].name == c)
+		{
+			return tiles[i].indice;
+		}
+	}
+	return -1;
+}
+
+bool read_lines(const std::string& access, std::vector<std::string>& lines) // Lit le fichier texte : une ligne du fichier = une ligne de 'lines'
+{
+	std::ifstream file(access);
+	if (!file)
+	{
+		std::cout << "Impossible d'ouvrir " << access << std::endl;
 		return false;
 	}
 
-	std::string line; //Initie la ligne de texte
-	for (int i = 0; i < x; i++)
+	std::string line;
+	while (std::getline(file, line))
 	{
-		if (!std::getline(file, line) || line.size() < y) //verifie s'il peut pas atteindre la ligne et si la taille de la ligne est correcte
+		if (!line.empty())
 		{
-			std::cout << "Ligne " << i << " invalide ou trop courte" << std::endl;
-			return false;
+			lines.push_back(line);
 		}
+	}
 
-		for (int j = 0; j < y; j++)
+	if (lines.empty())
+	{
+		std::cout << "Fichier vide : " << access << std::endl;
+		return false;
+	}
+	return true;
+}
+
+
+bool load_map(const std::string& access, grid& map, entity& player, std::vector<enemy>& creatures)//Transforme le fichier texte en tableau de int
+{
+	std::vector<std::string> lines;
+	if (!read_lines(access, lines))
+	{
+		return false;
+	}
+
+	int height = static_cast<int>(lines.size());
+	int width = static_cast<int>(lines[0].size());
+	map.assign(height, std::vector<int>(width, ground.indice));
+	creatures.clear();
+
+	bool player_found = false;
+	bool exit_found = false;
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
 		{
-			int value = -1; //initie une valeur pour remplir le tableau de Int
-			for (int c = 0; c < 4; c++)
-			{
-				if (line[j] == tiles[c].name)
-					value = tiles[c].indice;
-			}
+			char c = lines[i][j];
 
-			if (value == -1)
+			if (c == player_char)
 			{
-				std::cout << "Caractère inconnu '" << line[j]
-					<< "' ligne " << i << ", colonne " << j << std::endl;
-				return false;
+				player_found = true;
+				player.coord_x = i;
+				player.coord_y = j;
 			}
-			map[i][j] = value;
+			else if (c == enemy_char)
+			{
+				enemy creature{ { i, j, enemy_char, enemy_health }, enemy_damage };
+				creatures.push_back(creature);
+			}
+			else
+			{
+				int index = find_tile_index(c);
+				if (tiles[index].win_cond)
+				{
+					exit_found = true;
+				}
+				map[i][j] = index;
+			}
 		}
 	}
 	return true;
 }
 
-int level_playing(int map[x][y], enemy* creatures, entity player) //Lance le level
+
+int level_playing(const grid& map, std::vector<enemy>& creatures, entity player)
 {
-	while (win_condition(player, map, player.coord_x, player.coord_y) == false) //Tant que la case Win n'est pas atteinte la boucle de jeu continue !
+	while (!win_condition(map, player.coord_x, player.coord_y)) // jusqu'à atteindre E
 	{
 		showMap(map, player, creatures);
 		char input = _getch();
 		move_entity(player, input, map);
+		take_tile_damage(player, map);
 		losinghealth(player, creatures);
 		creaturesMove(creatures, map);
 		losinghealth(player, creatures);
@@ -248,53 +366,34 @@ int level_playing(int map[x][y], enemy* creatures, entity player) //Lance le lev
 
 int main()
 {
-	srand(time(0));
-	int gamestate = 0;
-	int map1[x][y];
-	if (!load_map("MAPS\\map1.txt", map1))
-		return -1;
-	int map2[x][y];
-	if (!load_map("MAPS\\map2.txt", map2))
-		return -1;
-	enemy creatures[nb_enemies] = {//Infos ennemies lvl 1
-		{1,8,'X',1,1},
-		{8,2 ,'X',1,1},
-		{8,17,'X',1,1},
-		{1,1 ,'X',1,1},
-		{5,10,'X',1,1}
-	};
-	enemy creatures2[nb_enemies] = {// Infos ennemis lvl2 
-		{2,8,'X',1,1},
-		{8,3 ,'X',1,1},
-		{8,18,'X',1,1},
-		{1,8 ,'X',1,1},
-		{6,9,'X',1,1}
-	};
-	entity player{ 2,4,'H',1 }; //Infos Joueur lvl 1
-	entity player2{ 2,2,'H',2 }; //Infos Joueur lvl 2
-	char input = 'p';//Initie l'input qui va lancer le storytime
-	storytime(input, gamestate); //Ecran de lancement + Lore 
-	while (gamestate != 666)//boucle du jeu jusqu'à Game Over
-	{
-		gamestate = level_playing(map1, creatures, player);
+	srand(static_cast<unsigned int>(time(0)));
 
-		switch (gamestate)
+	char input = 'p';
+	storytime(input, 0); // Ecran de lancement + lore
+
+	for (int current_level = 0; current_level < nb_levels; current_level++)
+	{
+		grid map;//initie la map
+		std::vector<enemy> creatures;//initie les ennemis
+		entity player{ 0, 0, player_char, levels[current_level].player_health };//initie le joueur
+
+		if (!load_map(levels[current_level].map_file, map, player, creatures))
 		{
-		case 1: // niveau 1 réussi -> niveau 2
-			gamestate = level_playing(map2, creatures2, player2);
-			if (gamestate == 1) // niveau 2 réussi -> victoire (projet en cours)
-			{
-				system("cls");
-				std::cout << "Salvation Obtained"<< std::endl;
-				std::cout << "Was it w"<< std::endl;
-				return 42;
-			}
-			break;
-		default: // 666 : le joueur est mort, la boucle s'arrête
-			break;
+			return -1;
 		}
+
+		int gamestate = level_playing(map, creatures, player);
+
+		if (gamestate == 666) // le joueur est mort -> Game Over
+		{
+			system("cls");
+			storytime('p', gamestate);
+			return 666;
+		}
+		storytime(input, gamestate + current_level);
 	}
+
 	system("cls");
-	storytime('p', gamestate);
-	return 666;
+	std::cout << "Salvation Obtained !";
+	return 10;
 }
