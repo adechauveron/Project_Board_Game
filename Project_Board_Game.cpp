@@ -6,7 +6,7 @@
 #include <vector>
 #include <conio.h>
 
-using grid = std::vector<std::vector<int>>;
+using grid = std::vector<std::vector<int>>; //Vecteur de vecteurs (Tableau de tableaux) de int, représentant la map du niveau
 
 struct entity
 {
@@ -60,6 +60,7 @@ const level levels[] = {
 	{ "MAPS\\map3.txt", 1 },
 	{ "MAPS\\map4.txt", 1 },
 	{ "MAPS\\map5.txt", 2 },
+	{ "MAPS\\map6.txt", 2 },
 	{ "MAPS\\map7.txt", 2 },
 	{ "MAPS\\map8.txt", 2 },
 	{"MAPS\\map9.txt", 3 }
@@ -68,8 +69,14 @@ const int nb_levels = 10;
 
 
 
-int map_height(const grid& map) { return static_cast<int>(map.size()); }
-int map_width(const grid& map) { return static_cast<int>(map[0].size()); }
+int map_height(const grid& map) 
+{ 
+	return static_cast<int>(map.size()); //hauteur de la map = nombre de lignes du tableau
+}
+int map_width(const grid& map) 
+{ 
+	return static_cast<int>(map[0].size()); //largeur de la map = nombre de colonnes du tableau (prend le nombre d'éléments de la première ligne)
+}
 
 tile get_tile_at(const grid& map, int coord_x, int coord_y)
 {
@@ -375,8 +382,7 @@ int level_playing(const grid& map, std::vector<enemy>& creatures, entity player)
 
 int main()
 {
-	srand(static_cast<unsigned int>(time(0)));
-
+	srand(time(0));
 	char input = 'p';
 	storytime(input, 0); // Ecran de lancement + lore
 
