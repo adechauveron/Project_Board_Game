@@ -37,12 +37,30 @@ struct level
 	int player_health;
 };
 
+enum class play_state
+{
+	moving,     // le joueur se déplace 
+	targeting   // le joueur choisit la case du sort avec le curseur 
+};
 
-static const char player_char = 'H';
-static const char enemy_char = 'X';
+struct spell_overlay
+{
+	bool active = false;
+	int cursor_x = 0;
+	int cursor_y = 0;
+};
 
-static const int enemy_health = 1;
-static const int enemy_damage = 1;
+const char spell_key = 'e';        // touche pour ouvrir / confirmer le sort
+const char cancel_key = 27;        // Echap : annule le sort
+const int spell_range = 1;         // portée en carré autour du joueur
+const char range_char = '*';
+const char cursor_char = '^';
+
+const char player_char = 'H';
+
+const char enemy_char = 'X';
+const int enemy_health = 1;
+const int enemy_damage = 1;
 
 const tile water{ '~', 1, false };
 const tile mountain{ 'M', 2, false };
@@ -115,19 +133,78 @@ void losinghealth(entity& player, const std::vector<enemy>& creatures)
 	}
 }
 
-void showMap(const grid& map, const entity& player, const std::vector<enemy>& creatures)
+bool in_spell_range(const entity& player, int x, int y)
+{
+	return (std::abs(x - player.coord_x) <= spell_range && std::abs(y - player.coord_y) <= spell_range);
+}
+
+void move_cursor(spell_overlay& spell, char direction, const grid& map, const entity& player)
+{
+	int new_x = spell.cursor_x;
+	int new_y = spell.cursor_y;
+
+	switch (direction)
+	{
+	case 'z':
+		new_x -=1;
+		break;
+	case 's':
+		new_x +=1; 
+		break;
+	case 'q': 
+		new_y -=1; 
+		break;
+	case 'd': 
+		new_y +=1; 
+		break;
+	default: 
+		return;
+	}
+
+	bool outside = new_x < 0 || new_x >= map_height(map) || new_y < 0 || new_y >= map_width(map);
+	if (outside || !in_spell_range(player, new_x, new_y))
+	{
+		return;
+	}
+
+	spell.cursor_x = new_x;
+	spell.cursor_y = new_y;
+}
+
+bool cast_spell(std::vector<enemy>& creatures, int target_x, int target_y)
+{
+	for (std::vector<enemy>::iterator it = creatures.begin(); it != creatures.end(); ++it) //Parcourt le tableau dynamique creatures
+	{
+		if (it->monster.coord_x == target_x && it->monster.coord_y == target_y)
+		{
+			creatures.erase(it);
+			return true;
+		}
+	}
+	return false;
+}
+
+void showMap(const grid& map, const entity& player, const std::vector<enemy>& creatures, const spell_overlay& spell = spell_overlay{})
 {
 	for (int i = 0; i < map_height(map); i++) // i = ligne
 	{
 		for (int j = 0; j < map_width(map); j++) // j = colonne
 		{
-			if (collidingenemy(creatures, i, j))
+			if (spell.active && i == spell.cursor_x && j == spell.cursor_y)
+			{
+				std::cout << cursor_char << ' ';
+			}
+			else if (collidingenemy(creatures, i, j))
 			{
 				std::cout << enemy_char << ' ';
 			}
 			else if (i == player.coord_x && j == player.coord_y)
 			{
 				std::cout << player_char << ' ';
+			}
+			else if (spell.active && in_spell_range(player, i, j))
+			{
+				std::cout << range_char << ' ';
 			}
 			else
 			{
@@ -217,6 +294,11 @@ void storytime(char input, int player_state) // Textes d'histoire
 	{
 		std::cout << "And the world fell to darkness...";
 	}
+}
+
+bool is_move_key(char c)
+{
+	return c == 'z' || c == 's' || c == 'q' || c == 'd';
 }
 
 void move_entity(entity& entity, char direction, const grid& map, const std::vector<enemy>* creatures = nullptr)
@@ -359,18 +441,78 @@ bool load_map(const std::string& access, grid& map, entity& player, std::vector<
 	return true;
 }
 
+void end_turn(entity& player, std::vector<enemy>& creatures, const grid& map)
+{
+	take_tile_damage(player, map);
+	losinghealth(player, creatures);
+	creaturesMove(creatures, map);
+	losinghealth(player, creatures);
+}
 
 int level_playing(const grid& map, std::vector<enemy>& creatures, entity player)
 {
+	play_state state = play_state::moving;
+	spell_overlay spell;
+
 	while (!win_condition(map, player.coord_x, player.coord_y)) // jusqu'à atteindre E
 	{
-		showMap(map, player, creatures);
+		showMap(map, player, creatures, spell);
+
+		if (state == play_state::moving)
+		{
+			std::cout << "\n[zqsd] Deplacement  [" << spell_key << "] Sort" << std::endl;
+		}
+		else
+		{
+			std::cout << "\n[zqsd] Curseur  [" << spell_key << "] Lancer  [Echap] Annuler" << std::endl;
+		}
+
 		char input = _getch();
-		move_entity(player, input, map);
-		take_tile_damage(player, map);
-		losinghealth(player, creatures);
-		creaturesMove(creatures, map);
-		losinghealth(player, creatures);
+		bool turn_ended = false;
+
+		switch (state)
+		{
+		case play_state::moving:
+			if (input == spell_key)
+			{
+				// Passage en mode ciblage : le curseur démarre sur le joueur
+				state = play_state::targeting;
+				spell.active = true;
+				spell.cursor_x = player.coord_x;
+				spell.cursor_y = player.coord_y;
+			}
+			else if (is_move_key(input))
+			{
+				move_entity(player, input, map);
+				turn_ended = true;
+			}
+			break;
+
+		case play_state::targeting:
+			if (is_move_key(input))
+			{
+				move_cursor(spell, input, map, player);
+			}
+			else if (input == spell_key)
+			{
+				cast_spell(creatures, spell.cursor_x, spell.cursor_y);
+				spell.active = false;
+				state = play_state::moving;
+				turn_ended = true;
+			}
+			else if (input == cancel_key)
+			{
+				spell.active = false;
+				state = play_state::moving;
+			}
+			break;
+		}
+
+		if (turn_ended)
+		{
+			end_turn(player, creatures, map);
+		}
+
 		system("cls");
 		if (player.health <= 0)
 		{

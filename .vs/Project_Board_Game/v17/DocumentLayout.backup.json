@@ -3,6 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\26269\\Documents\\GitHub\\Project_Board_Game\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{46292CC8-9CCE-6ED2-5D73-F908E5BA4CCD}|..\\..\\..\\AppData\\Roaming\\Microsoft\\VisualStudio\\17.0_0f7c1948\\SingleFileISense\\_sfi_f0e23466-7963-4a95-a1dd-f7bc875f1632_.vcxproj|C:\\USERS\\26269\\DOWNLOADS\\BOARDOFDREAMS_SOURCES\\BOARDOFDREAMS\\TYPES.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\spell.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\map.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\entities.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\display.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{35980C53-10C1-4D78-A1FE-D6F273D2FE07}|Project_Board_Game.vcxproj|C:\\Users\\26269\\Documents\\GitHub\\Project_Board_Game\\Project_Board_Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{35980C53-10C1-4D78-A1FE-D6F273D2FE07}|Project_Board_Game.vcxproj|solutionrelative:Project_Board_Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
@@ -14,17 +35,108 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "types.h",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\types.h",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\types.h",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\types.h",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\types.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-10-25T17:59:55.687Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "spell.cpp",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\spell.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\spell.cpp",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\spell.cpp",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\spell.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-25T17:59:47.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "map.cpp",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\map.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\map.cpp",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\map.cpp",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\map.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-25T17:59:40.077Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\main.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\main.cpp",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\main.cpp",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-25T17:59:37.228Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "game.cpp",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\game.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\game.cpp",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\game.cpp",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\game.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-25T17:59:34.587Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "entities.cpp",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\entities.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\entities.cpp",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\entities.cpp",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\entities.cpp",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-25T17:59:01.138Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "display.cpp",
+              "DocumentMoniker": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\display.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\display.cpp",
+              "ToolTip": "C:\\Users\\26269\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\display.cpp",
+              "RelativeToolTip": "..\\..\\..\\Downloads\\BoardOfDreams_sources\\BoardOfDreams\\display.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-25T17:58:25.232Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "Project_Board_Game.cpp",
               "DocumentMoniker": "C:\\Users\\26269\\Documents\\GitHub\\Project_Board_Game\\Project_Board_Game.cpp",
               "RelativeDocumentMoniker": "Project_Board_Game.cpp",
               "ToolTip": "C:\\Users\\26269\\Documents\\GitHub\\Project_Board_Game\\Project_Board_Game.cpp",
               "RelativeToolTip": "Project_Board_Game.cpp",
-              "ViewState": "AgIAAAIBAAAAAAAAAAAIwOoAAAACAAAAAAAAAA==",
+              "ViewState": "AgIAABkCAAAAAAAAAAAAACwCAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-10-12T12:43:45.625Z",
               "EditorCaption": ""
